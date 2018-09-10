@@ -78,20 +78,25 @@ namespace cloudscribe.Web.Navigation
             {
                 if (startingNode == null)
                 {
-                    if (startingNodeKey.Length > 0 && startingNodeKey != "RootNode")
+                    if(startingNodeKey == "RootNode")
+                    {
+                        return RootNode;
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(startingNodeKey))
                     {
                         startingNode = RootNode.FindByKey(startingNodeKey);
                         if (startingNode == null)
                         {
-                            log.LogWarning("could not find navigation node for starting node key "
-                                + startingNodeKey
-                                + " will fallback to RootNode.");
+                            log.LogWarning($"Could not find navigation node for starting node key '{startingNodeKey}', will fallback to {nameof(RootNode)}.");
+                            return RootNode;
+                        }
+                        else
+                        {
+                            return startingNode;
                         }
                     }
-
-                    return RootNode;
                 }
-
                 return startingNode;
             }
         }
@@ -306,7 +311,7 @@ namespace cloudscribe.Web.Navigation
         private bool FilterIsAllowed(TreeNode<NavigationNode> node)
         {
             if (string.IsNullOrEmpty(node.Value.ComponentVisibility)) { return true; }
-            if (navigationFilterName.Length == 0) { return false; }
+            if (string.IsNullOrWhiteSpace(navigationFilterName)) { return false; }
             if (node.Value.ComponentVisibility.Contains(navigationFilterName)) { return true; }
            
             return false;
